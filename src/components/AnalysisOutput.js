@@ -33,7 +33,11 @@ function AnalysisOutput({ analysisOutput }) {
     });
   };
 
-  return <div className="analysis-output">{formatOutput(analysisOutput)}</div>;
+  return (
+    <div className="analysis-output dark:text-white">
+      {formatOutput(analysisOutput)}
+    </div>
+  );
 }
 
 export default AnalysisOutput;
