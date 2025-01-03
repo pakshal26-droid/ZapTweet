@@ -28,6 +28,7 @@ function TextSummarizer2() {
   // Analysis states
   const [username, setUsername] = useState(""); // Creator's username
   const [analysisOutput, setAnalysisOutput] = useState(""); // Stores style analysis results
+  const [savedTweets, setSavedTweets] = useState([]); // Stores saved tweets
 
   // Helper Functions Section
 
@@ -103,6 +104,15 @@ function TextSummarizer2() {
 
     const result = await model.generateContent(tweetPrompt);
     return result.response.text();
+  };
+
+  // Save generated tweet to dashboard
+  const handleSaveTweet = () => {
+    if (outputText && activeTab === "tweet") {
+      setSavedTweets((prev) => [...prev, outputText]);
+      setSuccessMessage("Tweet saved to dashboard!");
+      setTimeout(() => setSuccessMessage(""), 3000);
+    }
   };
 
   // Main generation handler
@@ -190,6 +200,7 @@ function TextSummarizer2() {
     }
   };
 
+  
   // UI Event Handlers Section
 
   // Handles copying content to clipboard
@@ -332,6 +343,7 @@ function TextSummarizer2() {
                 : "Generate Thread"}
             </button>
           ))}
+          
         </div>
 
         {/* Output Section */}
@@ -373,21 +385,31 @@ function TextSummarizer2() {
 
                   {/* Post to X/Twitter Button */}
                   {activeTab === "tweet" && (
-                    <button
-                      onClick={handlePostToX}
-                      className="px-3 py-1.5 text-sm border border-gray-400 dark:border-gray-100 rounded-md
-                        text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-black/90
-                        transition-colors flex items-center gap-2"
-                    >
-                      <span>Post to </span>
-                      <svg
-                        className="w-4 h-4"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
+                    <>
+                      <button
+                        onClick={handlePostToX}
+                        className="px-3 py-1.5 text-sm border border-gray-400 dark:border-gray-100 rounded-md
+                          text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-black/90
+                          transition-colors flex items-center gap-2"
                       >
-                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                      </svg>
-                    </button>
+                        <span>Post to </span>
+                        <svg
+                          className="w-4 h-4"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                        >
+                          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={handleSaveTweet}
+                        className="px-3 py-1.5 text-sm border border-gray-400 dark:border-gray-100 rounded-md
+                          text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-black/90
+                          transition-colors flex items-center gap-2"
+                      >
+                        <span>Save to Dashboard</span>
+                      </button>
+                    </>
                   )}
                 </>
               )}
@@ -425,7 +447,30 @@ function TextSummarizer2() {
             Creator Tweet Analysis will appear here
           </h1>
         )}
+        {/* Saved Tweets Section */}
+        <div className="mt-5">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+            Saved Tweets
+          </h2>
+          {savedTweets.length > 0 ? (
+            <ul className="space-y-3">
+              {savedTweets.map((tweet, index) => (
+                <li
+                  key={index}
+                  className="p-3 border border-gray-300 dark:border-gray-500 rounded-lg bg-white dark:bg-black"
+                >
+                  {tweet}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-gray-500 dark:text-gray-400">
+              No tweets saved yet.
+            </p>
+          )}
+        </div>
       </div>
+      
     </div>
   );
 }
