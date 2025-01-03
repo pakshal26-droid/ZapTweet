@@ -4,11 +4,13 @@
   "private": true,
   "dependencies": {
     "@anthropic-ai/sdk": "^0.33.1",
+    "@deepgram/sdk": "^3.9.0",
     "@google/generative-ai": "^0.21.0",
     "@supabase/supabase-js": "^2.47.10",
     "autoprefixer": "^10.4.20",
     "axios": "^1.7.9",
     "cra-template": "1.2.0",
+    "deepgram": "^1.0.3",
     "postcss": "^8.4.49",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

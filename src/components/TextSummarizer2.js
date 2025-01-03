@@ -41,7 +41,7 @@ function TextSummarizer2() {
       const genAI = new GoogleGenerativeAI(
         process.env.REACT_APP_GEMINI_API_KEY
       );
-      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
 
       // Comprehensive analysis prompt
       const analysisPrompt = `You are a highly intelligent text analysis assistant trained to extract writing styles and formats from Twitter accounts. Your task is to analyze tweets and produce a concise summary that captures the essence of the account's tone, writing style, and format.
@@ -68,7 +68,7 @@ function TextSummarizer2() {
   // Generates content with style analysis for tweets
   const generateTweet = async () => {
     const genAI = new GoogleGenerativeAI(process.env.REACT_APP_GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
 
     // Get style analysis if username is provided
     const analysis = await analyzeCreatorTweets();
@@ -137,7 +137,9 @@ function TextSummarizer2() {
         const genAI = new GoogleGenerativeAI(
           process.env.REACT_APP_GEMINI_API_KEY
         );
-        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        const model = genAI.getGenerativeModel({
+          model: "gemini-2.0-flash-exp",
+        });
 
         const prompts = {
           summary: `Analyze the following text and generate an explanatory summary. The summary should:
