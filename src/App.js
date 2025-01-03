@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import TextSummarizer2 from "./components/TextSummarizer2";
 import SavedTweetsPage from "./pages/SavedTweetsPage";
-import ThemeToggle from "./components/ThemeToggle";
 import Navbar from "./components/Navbar";
 import Auth from "./components/Auth";
 import { supabase } from "./supabaseClient";
@@ -39,9 +38,7 @@ function App() {
     <Router>
       <div className="min-h-screen font-newsreader bg-gradient-to-b from-white to-gray-200 dark:from-black dark:to-gray-800">
         <ToastContainer />
-        <div className="flex  justify-end px-2">
-          <ThemeToggle />
-        </div>
+        
         
         {user ? (
           <>

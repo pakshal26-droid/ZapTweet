@@ -121,16 +121,7 @@ function TextSummarizer2() {
   };
 
   // Add a delete tweet function
-  const handleDeleteTweet = async (tweetId) => {
-    try {
-      await tweetService.deleteTweet(tweetId);
-      setSuccessMessage("Tweet deleted successfully!");
-      setTimeout(() => setSuccessMessage(""), 3000);
-    } catch (error) {
-      setErrorMessage("Failed to delete tweet");
-      setTimeout(() => setErrorMessage(""), 3000);
-    }
-  };
+  
 
   // Main generation handler
   const handleGenerate = async (type) => {
