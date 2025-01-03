@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import ToneSelector from "./ToneSelector";
 import AnalysisOutput from "./AnalysisOutput";
+import { tweetService } from '../services/tweetService';
 
 function TextSummarizer2() {
   // State Management Section
@@ -28,7 +29,6 @@ function TextSummarizer2() {
   // Analysis states
   const [username, setUsername] = useState(""); // Creator's username
   const [analysisOutput, setAnalysisOutput] = useState(""); // Stores style analysis results
-  const [savedTweets, setSavedTweets] = useState([]); // Stores saved tweets
 
   // Helper Functions Section
 
@@ -107,11 +107,28 @@ function TextSummarizer2() {
   };
 
   // Save generated tweet to dashboard
-  const handleSaveTweet = () => {
+  const handleSaveTweet = async () => {
     if (outputText && activeTab === "tweet") {
-      setSavedTweets((prev) => [...prev, outputText]);
-      setSuccessMessage("Tweet saved to dashboard!");
+      try {
+        await tweetService.saveTweet(outputText);
+        setSuccessMessage("Tweet saved successfully!");
+        setTimeout(() => setSuccessMessage(""), 3000);
+      } catch (error) {
+        setErrorMessage("Failed to save tweet");
+        setTimeout(() => setErrorMessage(""), 3000);
+      }
+    }
+  };
+
+  // Add a delete tweet function
+  const handleDeleteTweet = async (tweetId) => {
+    try {
+      await tweetService.deleteTweet(tweetId);
+      setSuccessMessage("Tweet deleted successfully!");
       setTimeout(() => setSuccessMessage(""), 3000);
+    } catch (error) {
+      setErrorMessage("Failed to delete tweet");
+      setTimeout(() => setErrorMessage(""), 3000);
     }
   };
 
@@ -247,7 +264,7 @@ function TextSummarizer2() {
   };
 
   // Handles posting to Twitter/X
-  const handlePostToX = () => {
+   const handlePostToX = () => {
     if (!outputText) return;
     const encodedText = encodeURIComponent(outputText);
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodedText}`;
@@ -274,7 +291,7 @@ function TextSummarizer2() {
 
   // JSX Section
   return (
-    <div className="flex flex-row gap-x-6 justify-center gap-y-4 flex-wrap  md:flex-nowrap">
+    <div className="flex flex-row gap-x-4 pb-4 justify-center gap-y-4 flex-wrap px-4  md:flex-nowrap">
       <div className="bg-white sm:w-2/3  dark:bg-black rounded-lg border border-gray-200 dark:border-gray-600 p-5 space-y-5">
         {/* Input Section */}
         <div>
@@ -447,28 +464,6 @@ function TextSummarizer2() {
             Creator Tweet Analysis will appear here
           </h1>
         )}
-        {/* Saved Tweets Section */}
-        <div className="mt-5">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
-            Saved Tweets
-          </h2>
-          {savedTweets.length > 0 ? (
-            <ul className="space-y-3">
-              {savedTweets.map((tweet, index) => (
-                <li
-                  key={index}
-                  className="p-3 border border-gray-300 dark:border-gray-500 rounded-lg bg-white dark:bg-black"
-                >
-                  {tweet}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-gray-500 dark:text-gray-400">
-              No tweets saved yet.
-            </p>
-          )}
-        </div>
       </div>
       
     </div>
