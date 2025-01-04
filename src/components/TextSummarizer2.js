@@ -3,6 +3,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import ToneSelector from "./ToneSelector";
 import AnalysisOutput from "./AnalysisOutput";
 import { tweetService } from '../services/tweetService';
+import { pdfService } from '../services/pdfService';
 
 function TextSummarizer2() {
   // State Management Section
@@ -29,6 +30,13 @@ function TextSummarizer2() {
   // Analysis states
   const [username, setUsername] = useState(""); // Creator's username
   const [analysisOutput, setAnalysisOutput] = useState(""); // Stores style analysis results
+
+  // PDF states
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [isProcessingPdf, setIsProcessingPdf] = useState(false);
+  const [uploadError, setUploadError] = useState('');
+  const [generatedTweets, setGeneratedTweets] = useState([]);
+  const [inputMethod, setInputMethod] = useState('text'); // 'text' or 'pdf'
 
   // Helper Functions Section
 
@@ -262,6 +270,46 @@ function TextSummarizer2() {
     window.open(twitterUrl, "_blank");
   };
 
+  // Add these functions to handle PDF upload
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file && file.type === 'application/pdf') {
+      setSelectedFile(file);
+      setUploadError('');
+    } else {
+      setSelectedFile(null);
+      setUploadError('Please select a PDF file');
+    }
+  };
+
+  const handlePdfUpload = async () => {
+    if (!selectedFile) {
+      setUploadError('Please select a PDF file first');
+      return;
+    }
+
+    setIsProcessingPdf(true);
+    setUploadError('');
+
+    try {
+      const tweets = await pdfService.uploadPdf(selectedFile);
+      setGeneratedTweets(tweets);
+      if (tweets.length > 0) {
+        const firstTweet = tweets[0];
+        setGeneratedContent(prev => ({
+          ...prev,
+          tweet: `${firstTweet.hook}\n\n${firstTweet.body}\n\n${firstTweet.cta}`
+        }));
+        setOutputText(`${firstTweet.hook}\n\n${firstTweet.body}\n\n${firstTweet.cta}`);
+        setActiveTab('tweet');
+      }
+    } catch (error) {
+      setUploadError('Failed to process PDF. Please try again.');
+    } finally {
+      setIsProcessingPdf(false);
+    }
+  };
+
   // Effect Hooks Section
 
   // Updates output text when switching tabs
@@ -303,21 +351,116 @@ function TextSummarizer2() {
           {/* Username Input */}
           <input
             type="text"
-            placeholder="Enter creator username"
+            placeholder="Enter creator username (optional)"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             className="w-full px-4 py-2 border dark:bg-black dark:text-white border-gray-300 dark:border-gray-500 rounded mb-4"
           />
 
           {/* Content Input */}
-          <textarea
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            placeholder="Enter content to generate results..."
-            className="w-full min-h-[180px] p-4 border border-gray-300 dark:border-gray-500 rounded-lg 
-              focus:ring-2 focus:ring-gray-800 dark:focus:ring-gray-100 resize-none
-              dark:bg-black dark:text-white dark:placeholder-gray-400 font-newsreader text-base"
-          />
+          <div className="mb-4">
+            <div className="flex gap-4 mb-4">
+              <button
+                onClick={() => setInputMethod('text')}
+                className={`px-4 py-2 rounded-md ${
+                  inputMethod === 'text'
+                    ? 'bg-black text-white dark:bg-white dark:text-black'
+                    : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
+                }`}
+              >
+                Type Text
+              </button>
+              <button
+                onClick={() => setInputMethod('pdf')}
+                className={`px-4 py-2 rounded-md ${
+                  inputMethod === 'pdf'
+                    ? 'bg-black text-white dark:bg-white dark:text-black'
+                    : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
+                }`}
+              >
+                Upload PDF
+              </button>
+            </div>
+
+            {inputMethod === 'text' ? (
+              <textarea
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                placeholder="Enter content to generate results..."
+                className="w-full min-h-[180px] p-4 border border-gray-300 dark:border-gray-500 rounded-lg 
+                  focus:ring-2 focus:ring-gray-800 dark:focus:ring-gray-100 resize-none
+                  dark:bg-black dark:text-white dark:placeholder-gray-400 font-newsreader text-base"
+              />
+            ) : (
+              <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6">
+                <input
+                  type="file"
+                  accept=".pdf"
+                  onChange={handleFileChange}
+                  className="hidden"
+                  id="pdf-upload"
+                />
+                <label
+                  htmlFor="pdf-upload"
+                  className="flex flex-col items-center cursor-pointer"
+                >
+                  <svg
+                    className="w-12 h-12 text-gray-400 mb-3"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                    />
+                  </svg>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    {selectedFile ? selectedFile.name : 'Click to upload PDF'}
+                  </span>
+                </label>
+                {selectedFile && (
+                  <button
+                    onClick={handlePdfUpload}
+                    disabled={isProcessingPdf}
+                    className="mt-4 w-full py-2 bg-black dark:bg-white text-white dark:text-black rounded-md
+                      hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
+                  >
+                    {isProcessingPdf ? (
+                      <div className="flex items-center justify-center">
+                        <svg
+                          className="animate-spin h-5 w-5 mr-3"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          />
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          />
+                        </svg>
+                        Processing PDF...
+                      </div>
+                    ) : (
+                      'Process PDF'
+                    )}
+                  </button>
+                )}
+                {uploadError && (
+                  <p className="text-red-500 text-sm mt-2">{uploadError}</p>
+                )}
+              </div>
+            )}
+          </div>
           {errorMessage && (
             <p className="text-red-500 text-sm mt-2">{errorMessage}</p>
           )}
@@ -457,6 +600,46 @@ function TextSummarizer2() {
         )}
       </div>
       
+      {activeTab === 'tweet' && generatedTweets.length > 0 && (
+        <div className="mt-4 space-y-4">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+            Generated Tweets from PDF
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {generatedTweets.map((tweet, index) => (
+              <div
+                key={index}
+                className="p-4 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer 
+                  hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+                onClick={() => {
+                  setOutputText(`${tweet.hook}\n\n${tweet.body}\n\n${tweet.cta}`);
+                  setGeneratedContent(prev => ({
+                    ...prev,
+                    tweet: `${tweet.hook}\n\n${tweet.body}\n\n${tweet.cta}`
+                  }));
+                }}
+              >
+                <div className="flex flex-col space-y-3">
+                  <p className="font-bold text-gray-900 dark:text-white text-lg">
+                    {tweet.hook}
+                  </p>
+                  <p className="text-gray-700 dark:text-gray-300">
+                    {tweet.body}
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-400 italic">
+                    {tweet.cta}
+                  </p>
+                </div>
+                <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 flex justify-end">
+                  <span className="text-sm text-gray-500">
+                    Tweet {index + 1} of {generatedTweets.length}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
