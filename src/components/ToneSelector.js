@@ -23,11 +23,21 @@ function ToneSelector({ selectedTones, onToneChange }) {
 
   return (
     <div className="space-y-2">
-      <div className="flex justify-between items-center">
-        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Select Tone (max 3)</h3>
-        <span className="text-sm text-gray-500 dark:text-gray-400">
-          {selectedTones.length}/3 selected
-        </span>
+      <div className="flex items-center justify-between gap-2 mb-2">
+        <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+          Select Writing Tone
+        </h3>
+        <div className="flex items-center">
+          <div className="h-2 w-24 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-black dark:bg-white transition-all duration-300"
+              style={{ width: `${(selectedTones.length / 3) * 100}%` }}
+            />
+          </div>
+          <span className="ml-2 text-sm text-gray-500">
+            {selectedTones.length}/3
+          </span>
+        </div>
       </div>
       <div className="flex flex-wrap gap-2">
         {AVAILABLE_TONES.map(tone => (

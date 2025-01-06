@@ -38,6 +38,9 @@ function TextSummarizer2() {
   const [generatedTweets, setGeneratedTweets] = useState([]);
   const [inputMethod, setInputMethod] = useState('text'); // 'text' or 'pdf'
 
+  // Add this state at the top with other states
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
   // Helper Functions Section
 
   // Analyzes the creator's writing style
@@ -47,9 +50,8 @@ function TextSummarizer2() {
     }
 
     try {
-      const genAI = new GoogleGenerativeAI(
-        process.env.REACT_APP_GEMINI_API_KEY
-      );
+      setIsAnalyzing(true);
+      const genAI = new GoogleGenerativeAI(process.env.REACT_APP_GEMINI_API_KEY);
       const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
 
       // Comprehensive analysis prompt
@@ -64,6 +66,7 @@ function TextSummarizer2() {
         Pacing: Note if the tweets are quick and concise or detailed and elaborate.
         Generate a Writing Blueprint: Based on the analysis, create a reusable blueprint for another model to emulate this writing style. The blueprint should include:
         Sentence structure.
+        Give the output in a concise manner 
         Preferred vocabulary or phrasing.`;
 
       const result = await model.generateContent(analysisPrompt);
@@ -71,6 +74,8 @@ function TextSummarizer2() {
     } catch (error) {
       console.error("Analysis Error:", error);
       throw error;
+    } finally {
+      setIsAnalyzing(false);
     }
   };
 
@@ -349,13 +354,14 @@ function TextSummarizer2() {
           </div>
 
           {/* Username Input */}
+          {inputMethod === "text" && (
           <input
             type="text"
-            placeholder="Enter creator username (optional)"
+            placeholder="Enter favourite X creator's username (optional)"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             className="w-full px-4 py-2 border dark:bg-black dark:text-white border-gray-300 dark:border-gray-500 rounded mb-4"
-          />
+          />)}
 
           {/* Content Input */}
           <div className="mb-4">
@@ -387,12 +393,14 @@ function TextSummarizer2() {
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 placeholder="Enter content to generate results..."
-                className="w-full min-h-[180px] p-4 border border-gray-300 dark:border-gray-500 rounded-lg 
+                className="w-full min-h-[240px] p-4 border border-gray-300 dark:border-gray-500 rounded-lg 
                   focus:ring-2 focus:ring-gray-800 dark:focus:ring-gray-100 resize-none
-                  dark:bg-black dark:text-white dark:placeholder-gray-400 font-newsreader text-base"
+                  dark:bg-black dark:text-white dark:placeholder-gray-400 font-sans text-base"
               />
             ) : (
-              <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6">
+              <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 
+                hover:border-gray-400 dark:hover:border-gray-500 transition-colors
+                shadow-sm hover:shadow-md">
                 <input
                   type="file"
                   accept=".pdf"
@@ -404,34 +412,40 @@ function TextSummarizer2() {
                   htmlFor="pdf-upload"
                   className="flex flex-col items-center cursor-pointer"
                 >
-                  <svg
-                    className="w-12 h-12 text-gray-400 mb-3"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                    />
-                  </svg>
-                  <span className="text-gray-600 dark:text-gray-400">
+                  <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-full mb-4">
+                    <svg
+                      className="w-12 h-12 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      />
+                    </svg>
+                  </div>
+                  <span className="text-lg text-gray-600 dark:text-gray-400 mb-2">
                     {selectedFile ? selectedFile.name : 'Click to upload PDF'}
+                  </span>
+                  <span className="text-sm text-gray-500">
+                    or drag and drop your file here
                   </span>
                 </label>
                 {selectedFile && (
                   <button
                     onClick={handlePdfUpload}
                     disabled={isProcessingPdf}
-                    className="mt-4 w-full py-2 bg-black dark:bg-white text-white dark:text-black rounded-md
-                      hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
+                    className="mt-6 w-full py-3 bg-black dark:bg-white text-white dark:text-black rounded-md
+                      hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors
+                      shadow-sm hover:shadow-md flex items-center justify-center gap-2"
                   >
                     {isProcessingPdf ? (
-                      <div className="flex items-center justify-center">
+                      <div className="flex items-center justify-center gap-2">
                         <svg
-                          className="animate-spin h-5 w-5 mr-3"
+                          className="animate-spin h-5 w-5"
                           viewBox="0 0 24 24"
                         >
                           <circle
@@ -448,10 +462,25 @@ function TextSummarizer2() {
                             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                           />
                         </svg>
-                        Processing PDF...
+                        Processing...
                       </div>
                     ) : (
-                      'Process PDF'
+                      <>
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                          />
+                        </svg>
+                        Process PDF
+                      </>
                     )}
                   </button>
                 )}
@@ -461,40 +490,41 @@ function TextSummarizer2() {
               </div>
             )}
           </div>
-          {errorMessage && (
-            <p className="text-red-500 text-sm mt-2">{errorMessage}</p>
+
+          {/* Only show Tone Selector and Action Buttons if not in PDF mode */}
+          {inputMethod === 'text' && (
+            <>
+              {/* Tone Selector */}
+              <ToneSelector
+                selectedTones={selectedTones}
+                onToneChange={handleToneChange}
+              />
+
+              {/* Action Buttons */}
+              <div className="flex mt-4 gap-3">
+                {["summary", "tweet", "thread"].map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => handleTabChange(type)}
+                    disabled={loading}
+                    className={`flex-1 py-2.5 px-4 rounded-lg text-white font-medium transition-colors ${
+                      loading
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : activeTab === type
+                        ? "bg-black dark:bg-white dark:text-black"
+                        : "bg-gray-900 hover:bg-gray-800 active:bg-gray-700 border border-gray-400 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200 dark:border-gray-100"
+                    }`}
+                  >
+                    {type === "summary"
+                      ? "Summarize"
+                      : type === "tweet"
+                      ? "Generate Tweet"
+                      : "Generate Thread"}
+                  </button>
+                ))}
+              </div>
+            </>
           )}
-        </div>
-
-        {/* Tone Selector */}
-        <ToneSelector
-          selectedTones={selectedTones}
-          onToneChange={handleToneChange}
-        />
-
-        {/* Action Buttons */}
-        <div className="flex gap-3">
-          {["summary", "tweet", "thread"].map((type) => (
-            <button
-              key={type}
-              onClick={() => handleTabChange(type)}
-              disabled={loading}
-              className={`flex-1 py-2.5 px-4 rounded-lg text-white font-medium transition-colors ${
-                loading
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : activeTab === type
-                  ? "bg-black dark:bg-white dark:text-black"
-                  : "bg-gray-900 hover:bg-gray-800 active:bg-gray-700 border border-gray-400 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200 dark:border-gray-100"
-              }`}
-            >
-              {type === "summary"
-                ? "Summarize"
-                : type === "tweet"
-                ? "Generate Tweet"
-                : "Generate Thread"}
-            </button>
-          ))}
-          
         </div>
 
         {/* Output Section */}
@@ -514,23 +544,14 @@ function TextSummarizer2() {
                 <>
                   <button
                     onClick={handleCopy}
-                    className="px-3 py-1.5 text-sm border border-gray-400 dark:border-gray-100 rounded-md
-                      text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-black/90
-                      transition-colors flex items-center gap-2"
+                    className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white
+                      border border-gray-300 dark:border-gray-600 rounded-md
+                      transition-colors duration-200"
+                    data-tooltip-id="copy-tooltip"
+                    data-tooltip-content="Copy to clipboard"
                   >
-                    <span>Copy</span>
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"
-                      />
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
                     </svg>
                   </button>
 
@@ -569,7 +590,7 @@ function TextSummarizer2() {
           <div
             className="w-full min-h-[180px] p-4 border border-gray-300 dark:border-gray-500 rounded-lg
             bg-white dark:bg-black whitespace-pre-line
-            text-gray-900 placeholder-gray-400 dark:text-white overflow-y-auto font-newsreader text-base"
+            text-gray-900 placeholder-gray-400 dark:text-white overflow-y-auto font-sans text-base"
           >
             {outputText ||
               `Generated ${
@@ -585,61 +606,83 @@ function TextSummarizer2() {
           )}
         </div>
       </div>
-      <div className="sm:w-1/3  pt-5 pb-3 px-5 bg-white dark:bg-black rounded-lg border border-gray-200 dark:border-gray-600 overflow-scroll">
-        {analysisOutput ? (
-          <>
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
-              Analysis of @{username}
-            </h2>
-            <AnalysisOutput analysisOutput={analysisOutput} />
-          </>
+      <div className="sm:w-1/3 w-full pt-5 pb-3 px-5 bg-white dark:bg-black rounded-lg border border-gray-200 dark:border-gray-600 overflow-scroll">
+        {isAnalyzing || isProcessingPdf ? (
+          <div className="flex flex-col items-center justify-center h-full min-h-[300px]">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900 dark:border-white mb-4"></div>
+            <p className="text-gray-600 dark:text-gray-400">
+              {isAnalyzing ? "Analyzing creator's style..." : "Processing PDF..."}
+            </p>
+          </div>
+        ) : inputMethod === 'text' ? (
+          // Analysis Output for Text Mode
+          analysisOutput ? (
+            <>
+              <h2 className="text-xl tracking-tight font-semibold text-gray-900 dark:text-white mb-3">
+                Analysis of @{username}
+              </h2>
+              <AnalysisOutput analysisOutput={analysisOutput} />
+            </>
+          ) : (
+            <>
+            <h1 className="text-xl tracking-tight font-semibold text-gray-900 mb-4 dark:text-white">
+              Creator's X Analysis
+            </h1>
+            <p className="text-gray-500">
+              Creator analysis will appear here
+            </p>
+            </>
+            
+
+          )
         ) : (
-          <h1 className="text-xl font-medium dark:text-white">
-            Creator Tweet Analysis will appear here
-          </h1>
+          // PDF Generated Tweets Display
+          <>
+            <h2 className="text-xl tracking-tight font-semibold text-gray-900 dark:text-white mb-4">
+              Generated Tweets from PDF
+            </h2>
+            {generatedTweets.length > 0 ? (
+              <div className="space-y-4">
+                {generatedTweets.map((tweet, index) => (
+                  <div
+                    key={index}
+                    className="p-4 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer 
+                      hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+                    onClick={() => {
+                      setOutputText(`${tweet.hook}\n\n${tweet.body}\n\n${tweet.cta}`);
+                      setGeneratedContent(prev => ({
+                        ...prev,
+                        tweet: `${tweet.hook}\n\n${tweet.body}\n\n${tweet.cta}`
+                      }));
+                    }}
+                  >
+                    <div className="flex flex-col space-y-3">
+                      <p className="font-bold text-gray-900 dark:text-white">
+                        {tweet.hook}
+                      </p>
+                      <p className="text-gray-700 dark:text-gray-300">
+                        {tweet.body}
+                      </p>
+                      <p className="text-gray-600 dark:text-gray-400 italic">
+                        {tweet.cta}
+                      </p>
+                    </div>
+                    <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 flex justify-end">
+                      <span className="text-sm text-gray-500">
+                        Tweet {index + 1} of {generatedTweets.length}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500">
+                Your tweets from PDF will appear here
+              </p>
+            )}
+          </>
         )}
       </div>
-      
-      {activeTab === 'tweet' && generatedTweets.length > 0 && (
-        <div className="mt-4 space-y-4">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-            Generated Tweets from PDF
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {generatedTweets.map((tweet, index) => (
-              <div
-                key={index}
-                className="p-4 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer 
-                  hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
-                onClick={() => {
-                  setOutputText(`${tweet.hook}\n\n${tweet.body}\n\n${tweet.cta}`);
-                  setGeneratedContent(prev => ({
-                    ...prev,
-                    tweet: `${tweet.hook}\n\n${tweet.body}\n\n${tweet.cta}`
-                  }));
-                }}
-              >
-                <div className="flex flex-col space-y-3">
-                  <p className="font-bold text-gray-900 dark:text-white text-lg">
-                    {tweet.hook}
-                  </p>
-                  <p className="text-gray-700 dark:text-gray-300">
-                    {tweet.body}
-                  </p>
-                  <p className="text-gray-600 dark:text-gray-400 italic">
-                    {tweet.cta}
-                  </p>
-                </div>
-                <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 flex justify-end">
-                  <span className="text-sm text-gray-500">
-                    Tweet {index + 1} of {generatedTweets.length}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

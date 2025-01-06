@@ -4,7 +4,7 @@ export const pdfService = {
       const formData = new FormData();
       formData.append('pdf', file);
 
-      const response = await fetch('https://pakshal914.app.n8n.cloud/webhook-test/pdf-upload', {
+      const response = await fetch(process.env.REACT_APP_WEBHOOK, {
         method: 'POST',
         body: formData,
       });

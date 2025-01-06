@@ -36,7 +36,7 @@ function App() {
 
   return (
     <Router>
-      <div className="min-h-screen font-newsreader bg-gradient-to-b from-white to-gray-200 dark:from-black dark:to-gray-800">
+      <div className="min-h-screen font-sans bg-gray-50 dark:bg-black  ">
         <ToastContainer />
         
         
@@ -52,7 +52,7 @@ function App() {
         ) : (
           <div className="container mx-auto px-4 py-8">
             <div className="max-w-full mx-auto">
-              <h1 className="text-5xl font-newsreader font-bold text-gray-900 dark:text-white mb-6">
+              <h1 className="text-5xl font-sans font-bold text-gray-900 dark:text-white mb-6">
                 ZapTweet
               </h1>
               <Auth setUser={setUser} />
