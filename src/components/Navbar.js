@@ -21,8 +21,8 @@ const Navbar = ({ user, onLogout }) => {
       )}
 
       <nav className="bg-white dark:bg-black border-b border-gray-200 dark:border-gray-600 sticky mb-4 top-0 z-50">
-        <div className="container mx-auto px-4 py-4 lg:py-6">
-          <div className="flex justify-between items-center">
+        <div className="container mx-auto  py-4 lg:py-6">
+          <div className="flex justify-between  w-screenitems-center">
             <h1 className="text-2xl lg:text-3xl font-sans font-bold text-gray-900 dark:text-white">
               ZapTweet
             </h1>
@@ -72,6 +72,7 @@ const Navbar = ({ user, onLogout }) => {
                   >
                     Saved
                   </Link>
+                  
                   <button
                     onClick={onLogout}
                     className="text-md bg-red-500 px-3 py-1 rounded-md text-white hover:text-red-800 font-medium"

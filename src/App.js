@@ -47,6 +47,7 @@ function App() {
               <Route path="/" element={<TextSummarizer2 />} />
               <Route path="/saved-tweets" element={<SavedTweetsPage />} />
               <Route path="*" element={<Navigate to="/" />} />
+             
             </Routes>
           </>
         ) : (

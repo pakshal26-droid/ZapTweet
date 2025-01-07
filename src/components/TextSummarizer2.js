@@ -4,13 +4,14 @@ import ToneSelector from "./ToneSelector";
 import AnalysisOutput from "./AnalysisOutput";
 import { tweetService } from '../services/tweetService';
 import { pdfService } from '../services/pdfService';
+import ReactMarkdown from 'react-markdown';
 
 function TextSummarizer2() {
   // State Management Section
   // Core content states
   const [inputText, setInputText] = useState(""); // Stores the user's input text
   const [generatedContent, setGeneratedContent] = useState({
-    summary: "",
+    linkedin: "",
     tweet: "",
     thread: "",
   }); // Stores all generated content types
@@ -18,7 +19,7 @@ function TextSummarizer2() {
 
   // UI control states
   const [loading, setLoading] = useState(false); // Loading indicator
-  const [activeTab, setActiveTab] = useState("summary"); // Current content type
+  const [activeTab, setActiveTab] = useState("linkedin"); // Current content type
   const [errorMessage, setErrorMessage] = useState(""); // Error display
   const [successMessage, setSuccessMessage] = useState(""); // Success messages
 
@@ -173,11 +174,22 @@ function TextSummarizer2() {
         });
 
         const prompts = {
-          summary: `Analyze the following text and generate an explanatory summary. The summary should:
+          /*summary: `Analyze the following text and generate an explanatory summary. The summary should:
             - Highlight the main ideas, breaking them down in a clear and concise way
             - Include important details and context to provide a thorough understanding
             - Be structured logically to flow naturally
-            Text: ${inputText}`,
+            Text: ${inputText}`,*/
+          linkedin:`Write a professional and engaging LinkedIn post based on the following details:
+
+          The post should:
+          1. Start with an engaging hook or headline.
+          2. Be conversational and professional in tone.
+          3. Highlight key achievements, challenges, or learnings.
+          4. End with a reflection, gratitude, or a call-to-action.
+          5. User point format , lists wherever necessary
+          Make it long but impactful, and suitable for a LinkedIn audience.
+          Only give the 1 post as the output and nothing else.
+          Text: ${inputText}`,
           thread: `You are a professional social media copywriter. 
             Create a Twitter thread with these guidelines:
             Tone: ${
@@ -246,7 +258,7 @@ function TextSummarizer2() {
     setInputText("");
     setOutputText("");
     setGeneratedContent({
-      summary: "",
+      linkedin: "",
       tweet: "",
       thread: "",
     });
@@ -261,7 +273,7 @@ function TextSummarizer2() {
   const handleToneChange = (newTones) => {
     setSelectedTones(newTones);
     setGeneratedContent({
-      summary: "",
+      linkedin: "",
       tweet: "",
       thread: "",
     });
@@ -315,6 +327,21 @@ function TextSummarizer2() {
     }
   };
 
+  // Add this function alongside your other handlers
+  const handlePostToLinkedin = () => {
+    if (!outputText) return;
+    
+    // LinkedIn sharing URL parameters
+    const url = 'https://www.linkedin.com/sharing/share-offsite/';
+    const params = new URLSearchParams({
+      url: window.location.href, // Current page URL
+      text: outputText, // The generated LinkedIn post content
+    });
+
+    // Open LinkedIn sharing dialog in a new window
+    window.open(`${url}?${params.toString()}`, '_blank');
+  };
+
   // Effect Hooks Section
 
   // Updates output text when switching tabs
@@ -326,7 +353,7 @@ function TextSummarizer2() {
   useEffect(() => {
     if (inputText !== lastProcessedText) {
       setGeneratedContent({
-        summary: "",
+        linkedin: "",
         tweet: "",
         thread: "",
       });
@@ -502,7 +529,7 @@ function TextSummarizer2() {
 
               {/* Action Buttons */}
               <div className="flex mt-4 gap-3">
-                {["summary", "tweet", "thread"].map((type) => (
+                {["linkedin", "tweet", "thread"].map((type) => (
                   <button
                     key={type}
                     onClick={() => handleTabChange(type)}
@@ -515,8 +542,8 @@ function TextSummarizer2() {
                         : "bg-gray-900 hover:bg-gray-800 active:bg-gray-700 border border-gray-400 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200 dark:border-gray-100"
                     }`}
                   >
-                    {type === "summary"
-                      ? "Summarize"
+                    {type === "linkedin"
+                      ? "Linkedin Post"
                       : type === "tweet"
                       ? "Generate Tweet"
                       : "Generate Thread"}
@@ -531,9 +558,9 @@ function TextSummarizer2() {
         <div>
           <div className="flex justify-between items-center mb-3">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-              {activeTab === "summary"
-                ? "Summary"
-                : activeTab === "tweet"
+              {activeTab === "linkedin" && inputMethod === "text"
+                ? "Linkedin Post"
+                : activeTab === "tweet" && inputMethod === "text" || inputMethod === "pdf"
                 ? "Generated Tweet"
                 : "Generated Thread"}
             </h2>
@@ -555,6 +582,25 @@ function TextSummarizer2() {
                     </svg>
                   </button>
 
+                  {/* LinkedIn Share Button */}
+                  {activeTab === "linkedin" && (
+                    <button
+                      onClick={handlePostToLinkedin}
+                      className="px-3 py-1.5 text-sm border border-gray-400 dark:border-gray-100 rounded-md
+                        text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-black/90
+                        transition-colors flex items-center gap-2"
+                    >
+                      <span>Post to</span>
+                      <svg 
+                        className="w-4 h-4" 
+                        fill="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                      </svg>
+                    </button>
+                  )}
+
                   {/* Post to X/Twitter Button */}
                   {activeTab === "tweet" && (
                     <>
@@ -564,12 +610,8 @@ function TextSummarizer2() {
                           text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-black/90
                           transition-colors flex items-center gap-2"
                       >
-                        <span>Post to </span>
-                        <svg
-                          className="w-4 h-4"
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
-                        >
+                        <span>Post to</span>
+                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                           <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                         </svg>
                       </button>
@@ -594,10 +636,10 @@ function TextSummarizer2() {
           >
             {outputText ||
               `Generated ${
-                activeTab === "summary"
-                  ? "summary"
-                  : activeTab === "tweet"
-                  ? "tweet"
+                activeTab === "linkedin" && inputMethod === "text"
+                  ? "Linkedin Post"
+                  : activeTab === "tweet" && inputMethod === "text" || inputMethod === "pdf"
+                  ? "tweets"
                   : "thread"
               } will appear here...`}
           </div>
@@ -615,25 +657,43 @@ function TextSummarizer2() {
             </p>
           </div>
         ) : inputMethod === 'text' ? (
-          // Analysis Output for Text Mode
-          analysisOutput ? (
+          activeTab === 'linkedin' ? (
+            // LinkedIn Post Display
             <>
-              <h2 className="text-xl tracking-tight font-semibold text-gray-900 dark:text-white mb-3">
-                Analysis of @{username}
+              <h2 className="text-xl tracking-tight font-semibold text-gray-900 dark:text-white mb-4">
+                LinkedIn Post Preview
               </h2>
-              <AnalysisOutput analysisOutput={analysisOutput} />
+              <div className="markdown-content">
+                {generatedContent.linkedin ? (
+                  <MarkdownDisplay content={generatedContent.linkedin} />
+                ) : (
+                  <p className="text-gray-500">
+                    Generated LinkedIn post will appear here
+                  </p>
+                )}
+              </div>
             </>
           ) : (
-            <>
-            <h1 className="text-xl tracking-tight font-semibold text-gray-900 mb-4 dark:text-white">
-              Creator's X Analysis
-            </h1>
-            <p className="text-gray-500">
-              Creator analysis will appear here
-            </p>
-            </>
-            
-
+            // Analysis Output for Tweet Generation
+            analysisOutput ? (
+              <>
+                <h2 className="text-xl tracking-tight font-semibold text-gray-900 dark:text-white mb-3">
+                  Analysis of @{username}
+                </h2>
+                <div className="markdown-content">
+                  <MarkdownDisplay content={analysisOutput} />
+                </div>
+              </>
+            ) : (
+              <>
+                <h1 className="text-xl tracking-tight font-semibold text-gray-900 mb-4 dark:text-white">
+                  Creator's X Analysis
+                </h1>
+                <p className="text-gray-500">
+                  Creator analysis will appear here
+                </p>
+              </>
+            )
           )
         ) : (
           // PDF Generated Tweets Display
@@ -686,5 +746,20 @@ function TextSummarizer2() {
     </div>
   );
 }
+
+const MarkdownDisplay = ({ content }) => {
+  return (
+    <ReactMarkdown
+      className="prose dark:prose-invert max-w-none
+        prose-headings:text-gray-900 dark:prose-headings:text-white
+        prose-p:text-gray-700 dark:prose-p:text-gray-300
+        prose-strong:text-gray-900 dark:prose-strong:text-white
+        prose-ul:text-gray-700 dark:prose-ul:text-gray-300
+        prose-li:text-gray-700 dark:prose-li:text-gray-300"
+    >
+      {content}
+    </ReactMarkdown>
+  );
+};
 
 export default TextSummarizer2;
