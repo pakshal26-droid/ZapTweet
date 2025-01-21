@@ -233,6 +233,7 @@ function TextSummarizer2() {
     }
   };
 
+
   
   // UI Event Handlers Section
 
@@ -309,7 +310,9 @@ function TextSummarizer2() {
     setUploadError('');
 
     try {
-      const tweets = await pdfService.uploadPdf(selectedFile);
+      const tweets = await pdfService.uploadPdf(selectedFile) || ""
+      const sampleTweets = await pdfService.extractTextFromPdf(selectedFile)
+      console.log(sampleTweets)
       setGeneratedTweets(tweets);
       if (tweets.length > 0) {
         const firstTweet = tweets[0];
