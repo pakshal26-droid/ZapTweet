@@ -52,8 +52,10 @@ function Auth({ setUser }) {
   };
 
   return (
-    <div className="max-w-md mt-20  mx-auto p-6 bg-white dark:bg-black rounded-lg shadow-md">
-      <ToastContainer />
+    <>
+    <div className="px-20  h-[90vh] flex flex-col justify-center items-center">
+    <div className="max-w-md mt-20   mx-auto p-6 bg-white dark:bg-black rounded-lg shadow-md">
+       <ToastContainer />
       <h2 className="text-2xl dark:text-white font-bold mb-4">
         {isLogin ? "Login" : "Sign Up"}
       </h2>
@@ -100,6 +102,8 @@ function Auth({ setUser }) {
         </button>
       </p>
     </div>
+    </div>
+    </>
   );
 }
 

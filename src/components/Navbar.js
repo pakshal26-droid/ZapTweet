@@ -107,7 +107,7 @@ const Navbar = ({ user, onLogout }) => {
             {user && (
               <>
                 <Link
-                  to="/"
+                  to="/app"
                   className="block text-xl text-gray-900 dark:text-white hover:text-gray-600 dark:hover:text-gray-300"
                   onClick={toggleMenu}
                 >
