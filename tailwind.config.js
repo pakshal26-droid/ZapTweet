@@ -7,10 +7,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'sans-serif',],
-        anek:["Anek Latin"],
-        oswald:["Oswald"],
-        caladea:["Caladea"]
+        sans: ['Inter', 'sans-serif'],
       },
       typography: {
         DEFAULT: {

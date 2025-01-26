@@ -1,6 +1,4 @@
-/*import * as pdfjsLib from 'pdfjs-dist';
-
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+/*
 
 export const pdfService = {
   async uploadPdf(file) {
@@ -23,46 +21,12 @@ export const pdfService = {
       console.error('Error uploading PDF:', error);
       throw error;
     }
-  },
-
-  async extractTextFromPdf(file) {
-    try {
-      const fileReader = new FileReader();
-      
-      return new Promise((resolve, reject) => {
-        fileReader.onload = async (event) => {
-          try {
-            const typedArray = new Uint8Array(event.target.result);
-            const pdf = await pdfjsLib.getDocument(typedArray).promise;
-            let fullText = '';
-
-            for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-              const page = await pdf.getPage(pageNum);
-              const textContent = await page.getTextContent();
-              const pageText = textContent.items.map(item => item.str).join(' ');
-              fullText += pageText + '\n';
-            }
-            resolve(fullText);
-            console.log(fullText)
-          } catch (error) {
-            reject(error);
-          }
-        };
-        fileReader.onerror = (error) => {
-          reject(error);
-        };
-        fileReader.readAsArrayBuffer(file);
-      });
-    } catch (error) {
-      console.error('Error extracting text from PDF:', error);
-      throw error;
-    }
   }
 }; */
 import { getDocument } from 'pdfjs-dist/webpack';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-// Configure the worker
-const pdfjsVersion = '4.0.189';  // Specify the version explicitly
+
+const pdfjsVersion = '4.0.189';
 const pdfjsWorker = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsVersion}/pdf.worker.min.js`;
 if (typeof window !== 'undefined' && 'pdfjsWorker' in window === false) {
   window.pdfjsWorker = pdfjsWorker;
@@ -91,7 +55,6 @@ export const pdfService = {
               fullText += pageText + '\n';
             }
 
-            // Generate tweets from the extracted text
             const tweets = await this.generateTweetsFromText(fullText);
             resolve(tweets);
           } catch (error) {
@@ -115,7 +78,7 @@ export const pdfService = {
       const genAI = new GoogleGenerativeAI(process.env.REACT_APP_GEMINI_API_KEY);
       const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
 
-      const prompt = `Create 3 engaging tweets from the following text. Each tweet should be unique and highlight different aspects of the content.
+      const prompt = `Create 3 engaging tweets from the following text. Each tweet should be unique and highlight different aspects of the content. Return ONLY a JSON array with no markdown formatting or code blocks.
 
       Guidelines for each tweet:
       1. Structure each tweet with:
@@ -128,26 +91,26 @@ export const pdfService = {
       5. Ensure each tweet can stand alone
       6. Use natural, conversational language
 
-      Format the output as an array of 3 objects, each with these properties:
+      The response should be a plain JSON array of 3 objects with these exact properties:
       - hook: The attention-grabbing opening line
       - body: The main content of the tweet
       - cta: The call-to-action
 
       Text to process:
-      ${text}
-
-      Return only the JSON array without any additional explanation or text.`;
+      ${text}`;
 
       const result = await model.generateContent(prompt);
       const response = result.response.text();
-      console.log(response)
+      
       try {
+        // Clean the response text by removing markdown formatting
         const cleanedResponse = this.cleanJsonResponse(response);
         const tweets = JSON.parse(cleanedResponse);
-        
         return Array.isArray(tweets) ? tweets : [];
       } catch (error) {
         console.error('Error parsing tweets:', error);
+        console.log('Raw response:', response);
+        console.log('Cleaned response:', this.cleanJsonResponse(response));
         return [];
       }
     } catch (error) {
@@ -155,6 +118,7 @@ export const pdfService = {
       return [];
     }
   },
+
   cleanJsonResponse(response) {
     // Remove markdown code block formatting
     let cleaned = response.replace(/```json\n?/g, '').replace(/```\n?/g, '');
