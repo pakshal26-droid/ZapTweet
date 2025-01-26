@@ -7,10 +7,10 @@ import Auth from "./components/Auth";
 import { supabase } from "./supabaseClient";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import LandingPage from "./pages/LandingPage";
 function App() {
   const [user, setUser] = useState(null);
-
+const [showAuth, setShowAuth] = useState(false);  
   useEffect(() => {
     const session = supabase.auth.getSession();
     setUser(session?.user || null);
@@ -36,29 +36,30 @@ function App() {
 
   return (
     <Router>
-      <div className="min-h-screen font-sans bg-gray-50 dark:bg-black  ">
+      <div className="min-h-screen font-sans bg-gray-50 dark:bg-black">
         <ToastContainer />
-        
-        
         {user ? (
           <>
             <Navbar user={user} onLogout={handleLogout} />
             <Routes>
-              <Route path="/" element={<TextSummarizer2 />} />
+              <Route path="/app" element={<TextSummarizer2 />} />
               <Route path="/saved-tweets" element={<SavedTweetsPage />} />
-              <Route path="*" element={<Navigate to="/" />} />
-             
+              <Route path="*" element={<Navigate to="/app" />} />
             </Routes>
           </>
         ) : (
-          <div className="container mx-auto px-4 py-8">
-            <div className="max-w-full mx-auto">
-              <h1 className="text-5xl font-sans font-bold text-gray-900 dark:text-white mb-6">
-                ZapTweet
-              </h1>
-              <Auth setUser={setUser} />
-            </div>
-          </div>
+          <Routes>
+            <Route path="/" element={
+              <>
+                {showAuth ? (
+                  <Auth setUser={setUser} />
+                ) : (
+                  <LandingPage onGetStarted={() => setShowAuth(true)} />
+                )}
+              </>
+            } />
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
         )}
       </div>
     </Router>
