@@ -189,7 +189,7 @@ function TextSummarizer2() {
           5. User point format , lists wherever necessary
           Make it long but impactful, and suitable for a LinkedIn audience.
           Only give the 1 post as the output and nothing else.
-          Text: ${inputText}`,
+            Text: ${inputText}`,
           thread: `You are a professional social media copywriter. 
             Create a Twitter thread with these guidelines:
             Tone: ${
@@ -281,7 +281,7 @@ function TextSummarizer2() {
   };
 
   // Handles posting to Twitter/X
-   const handlePostToX = () => {
+  const handlePostToX = () => {
     if (!outputText) return;
     const encodedText = encodeURIComponent(outputText);
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodedText}`;
@@ -361,6 +361,22 @@ function TextSummarizer2() {
     }
   }, [inputText, lastProcessedText]);
 
+  // Add this effect to fetch saved tweets on component mount
+  /*useEffect(() => {
+    fetchSavedTweets();
+  }, []);
+
+  // Add this function to fetch saved tweets
+  /*const fetchSavedTweets = async () => {
+    try {
+      const tweets = await tweetService.fetchSavedTweets();
+      setSavedTweets(tweets);
+    } catch (error) {
+      setErrorMessage('Failed to fetch saved tweets');
+      setTimeout(() => setErrorMessage(''), 3000);
+    }
+  };*/
+
   // JSX Section
   return (
     <div className="flex flex-row gap-x-4 pb-4 justify-center gap-y-4 flex-wrap px-4  md:flex-nowrap">
@@ -417,12 +433,12 @@ function TextSummarizer2() {
             </div>
 
             {inputMethod === 'text' ? (
-              <textarea
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                placeholder="Enter content to generate results..."
+          <textarea
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            placeholder="Enter content to generate results..."
                 className="w-full min-h-[240px] p-4 border border-gray-300 dark:border-gray-500 rounded-lg 
-                  focus:ring-2 focus:ring-gray-800 dark:focus:ring-gray-100 resize-none
+              focus:ring-2 focus:ring-gray-800 dark:focus:ring-gray-100 resize-none
                   dark:bg-black dark:text-white dark:placeholder-gray-400 font-sans text-base"
               />
             ) : (
@@ -516,40 +532,40 @@ function TextSummarizer2() {
                   <p className="text-red-500 text-sm mt-2">{uploadError}</p>
                 )}
               </div>
-            )}
-          </div>
+          )}
+        </div>
 
           {/* Only show Tone Selector and Action Buttons if not in PDF mode */}
           {inputMethod === 'text' && (
             <>
-              {/* Tone Selector */}
-              <ToneSelector
-                selectedTones={selectedTones}
-                onToneChange={handleToneChange}
-              />
+        {/* Tone Selector */}
+        <ToneSelector
+          selectedTones={selectedTones}
+          onToneChange={handleToneChange}
+        />
 
-              {/* Action Buttons */}
+        {/* Action Buttons */}
               <div className="flex mt-4 gap-3">
                 {["linkedin", "tweet", "thread"].map((type) => (
-                  <button
-                    key={type}
-                    onClick={() => handleTabChange(type)}
-                    disabled={loading}
-                    className={`flex-1 py-2.5 px-4 rounded-lg text-white font-medium transition-colors ${
-                      loading
-                        ? "bg-gray-400 cursor-not-allowed"
-                        : activeTab === type
-                        ? "bg-black dark:bg-white dark:text-black"
-                        : "bg-gray-900 hover:bg-gray-800 active:bg-gray-700 border border-gray-400 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200 dark:border-gray-100"
-                    }`}
-                  >
+            <button
+              key={type}
+              onClick={() => handleTabChange(type)}
+              disabled={loading}
+              className={`flex-1 py-2.5 px-4 rounded-lg text-white font-medium transition-colors ${
+                loading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : activeTab === type
+                  ? "bg-black dark:bg-white dark:text-black"
+                  : "bg-gray-900 hover:bg-gray-800 active:bg-gray-700 border border-gray-400 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200 dark:border-gray-100"
+              }`}
+            >
                     {type === "linkedin"
                       ? "Linkedin Post"
-                      : type === "tweet"
-                      ? "Generate Tweet"
-                      : "Generate Thread"}
-                  </button>
-                ))}
+                : type === "tweet"
+                ? "Generate Tweet"
+                : "Generate Thread"}
+            </button>
+          ))}
               </div>
             </>
           )}
@@ -587,19 +603,19 @@ function TextSummarizer2() {
                   {activeTab === "linkedin" && (
                     <button
                       onClick={handlePostToLinkedin}
-                      className="px-3 py-1.5 text-sm border border-gray-400 dark:border-gray-100 rounded-md
-                        text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-black/90
-                        transition-colors flex items-center gap-2"
-                    >
+                    className="px-3 py-1.5 text-sm border border-gray-400 dark:border-gray-100 rounded-md
+                      text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-black/90
+                      transition-colors flex items-center gap-2"
+                  >
                       <span>Post to</span>
-                      <svg 
-                        className="w-4 h-4" 
+                    <svg
+                      className="w-4 h-4"
                         fill="currentColor" 
-                        viewBox="0 0 24 24"
-                      >
+                      viewBox="0 0 24 24"
+                    >
                         <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                      </svg>
-                    </button>
+                    </svg>
+                  </button>
                   )}
 
                   {/* Post to X/Twitter Button */}
@@ -677,19 +693,19 @@ function TextSummarizer2() {
           ) : (
             // Analysis Output for Tweet Generation
             analysisOutput ? (
-              <>
+          <>
                 <h2 className="text-xl tracking-tight font-semibold text-gray-900 dark:text-white mb-3">
-                  Analysis of @{username}
-                </h2>
+              Analysis of @{username}
+            </h2>
                 <div className="markdown-content">
                   <MarkdownDisplay content={analysisOutput} />
                 </div>
-              </>
-            ) : (
+          </>
+        ) : (
               <>
                 <h1 className="text-xl tracking-tight font-semibold text-gray-900 mb-4 dark:text-white">
                   Creator's X Analysis
-                </h1>
+          </h1>
                 <p className="text-gray-500">
                   Creator analysis will appear here
                 </p>
@@ -701,15 +717,16 @@ function TextSummarizer2() {
           <>
             <h2 className="text-xl tracking-tight font-semibold text-gray-900 dark:text-white mb-4">
               Generated Tweets from PDF
-            </h2>
+          </h2>
             {generatedTweets.length > 0 ? (
               <div className="space-y-4">
                 {generatedTweets.map((tweet, index) => (
+                  <>
                   <div
                     key={index}
                     className="p-4 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer 
                       hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
-                    onClick={() => {
+                      onClick={() => {
                       setOutputText(`${tweet.hook}\n\n${tweet.body}\n\n${tweet.cta}`);
                       setGeneratedContent(prev => ({
                         ...prev,
@@ -734,16 +751,21 @@ function TextSummarizer2() {
                       </span>
                     </div>
                   </div>
-                ))}
+                  <span className="text-xs text-gray-500 absolute top-2 right-2">
+                    {new Date(tweet.created_at).toLocaleDateString()}
+                  </span>
+                </>
+              ))}
               </div>
-            ) : (
+          ) : (
               <p className="text-gray-500">
                 Your tweets from PDF will appear here
-              </p>
-            )}
+            </p>
+          )}
           </>
         )}
       </div>
+      
     </div>
   );
 }
