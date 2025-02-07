@@ -10,6 +10,12 @@ const Navbar = ({ user, onLogout }) => {
     setIsOpen(!isOpen);
   };
 
+  const navigation = [
+    { name: 'Home', href: '/app' },
+    { name: 'Saved Tweets', href: '/saved-tweets' },
+    { name: 'Saved LinkedIn Posts', href: '/linkedin-saved-posts' }
+  ];
+
   return (
     <>
       {/* Overlay when menu is open */}
@@ -20,10 +26,10 @@ const Navbar = ({ user, onLogout }) => {
         />
       )}
 
-      <nav className="bg-white dark:bg-black border-b border-gray-200 dark:border-gray-600 sticky mb-4 top-0 z-50">
-        <div className="container mx-auto  py-4 lg:py-6">
-          <div className="flex justify-between  w-screenitems-center">
-            <h1 className="text-2xl lg:text-3xl font-sans font-bold text-gray-900 dark:text-white">
+      <nav className="bg-white font-anek dark:bg-black border-b border-gray-200 dark:border-gray-600 sticky mb-4 top-0 z-50">
+        <div className=" mx-auto  md:px-8 px-5  py-4 lg:py-6">
+          <div className="flex justify-between  items-center">
+            <h1 className="text-2xl font-caladea tracking-tighter lg:text-3xl  font-bold text-gray-900 dark:text-white">
               ZapTweet
             </h1>
 
@@ -55,7 +61,7 @@ const Navbar = ({ user, onLogout }) => {
                   <Link
                     to="/"
                     className={`text-lg ${
-                      location.pathname === '/'
+                      location.pathname === '/app'
                         ? 'text-black dark:text-white font-semibold'
                         : 'text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white'
                     }`}
@@ -70,12 +76,21 @@ const Navbar = ({ user, onLogout }) => {
                         : 'text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white'
                     }`}
                   >
-                    Saved
+                    Saved Tweets
                   </Link>
-                  
+                  <Link
+                    to="/linkedin-saved-posts"
+                    className={`text-lg ${
+                      location.pathname === '/linkedin-saved-posts'
+                        ? 'text-black dark:text-white font-semibold'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white'
+                    }`}
+                  >
+                    LinkedIn Posts 
+                  </Link>
                   <button
                     onClick={onLogout}
-                    className="text-md bg-red-500 px-3 py-1 rounded-md text-white hover:text-red-800 font-medium"
+                    className="text-md  bg-red-500 px-3 py-1 rounded-md text-white hover:text-red-800 font-semibold"
                   >
                     Logout
                   </button>
@@ -120,6 +135,13 @@ const Navbar = ({ user, onLogout }) => {
                 >
                   Saved Tweets
                 </Link>
+                <Link
+                  to="/linkedin-saved-posts"
+                  className="block text-xl text-gray-900 dark:text-white hover:text-gray-600 dark:hover:text-gray-300"
+                  onClick={toggleMenu}
+                >
+                  Saved LinkedIn Posts
+                </Link>
                 <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                   <button
                     onClick={() => {
@@ -143,4 +165,4 @@ const Navbar = ({ user, onLogout }) => {
   );
 };
 
-export default Navbar; 
+export default Navbar;

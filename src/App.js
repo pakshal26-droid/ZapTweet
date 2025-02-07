@@ -8,6 +8,7 @@ import { supabase } from "./supabaseClient";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import LandingPage from "./pages/LandingPage";
+import SavedLinkedinPage from "./pages/SavedLinkedinPage";
 function App() {
   const [user, setUser] = useState(null);
 const [showAuth, setShowAuth] = useState(false);  
@@ -44,6 +45,7 @@ const [showAuth, setShowAuth] = useState(false);
             <Routes>
               <Route path="/app" element={<TextSummarizer2 />} />
               <Route path="/saved-tweets" element={<SavedTweetsPage />} />
+              <Route path="/linkedin-saved-posts" element={<SavedLinkedinPage/>} />
               <Route path="*" element={<Navigate to="/app" />} />
             </Routes>
           </>

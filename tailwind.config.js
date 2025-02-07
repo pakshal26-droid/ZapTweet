@@ -8,6 +8,8 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
+        caladea : ['Caladea', 'serif'],
+        anek : ['Anek Latin', 'sans-serif'],
       },
       typography: {
         DEFAULT: {

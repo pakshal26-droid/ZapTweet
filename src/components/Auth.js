@@ -53,10 +53,10 @@ function Auth({ setUser }) {
 
   return (
     <>
-    <div className="px-20  h-[90vh] flex flex-col justify-center items-center">
-    <div className="max-w-md mt-20   mx-auto p-6 bg-white dark:bg-black rounded-lg shadow-md">
+    <div className="px-20 font-anek  h-[90vh] flex flex-col justify-center items-center">
+    <div className="md:max-w-md mt-20 mx-auto p-6 bg-white dark:bg-black rounded-lg border-2 border-black/90 shadow-md">
        <ToastContainer />
-      <h2 className="text-2xl dark:text-white font-bold mb-4">
+      <h2 className="text-2xl dark:text-white font-caladea tracking-tighter font-bold mb-4">
         {isLogin ? "Login" : "Sign Up"}
       </h2>
       <form onSubmit={handleSubmit}>
@@ -90,15 +90,15 @@ function Auth({ setUser }) {
         {successMessage && <p className="text-green-500">{successMessage}</p>}
         <button
           type="submit"
-          className="w-full bg-blue-500 text-white p-2 rounded"
+          className="w-full bg-blue-600 hover:bg-white hover:text-black/90 border-black/90 border-2 font-semibold text-white p-2 rounded"
         >
           {isLogin ? "Login" : "Sign Up"}
         </button>
       </form>
-      <p className="mt-4 dark:text-white">
-        {isLogin ? "Don't have an account?" : "Already have an account?"}
+      <p className="mt-4 text-md font-medium dark:text-white">
+        {isLogin ? "Don't have an account? " : "Already have an account? "}
         <button onClick={() => setIsLogin(!isLogin)} className="text-blue-500">
-          {isLogin ? "  Sign Up" : " Login"}
+          {isLogin ? " Sign Up" : " Login"}
         </button>
       </p>
     </div>
