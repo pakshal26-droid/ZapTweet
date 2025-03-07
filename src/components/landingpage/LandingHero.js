@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import 'react-tooltip/dist/react-tooltip.css';
 import heropic from '../../heropic.jpg';
+import LandingPageSections from './LandingPageSections';
 
 
 const LandingHero = ({onGetStarted}) => {
@@ -20,12 +21,16 @@ const LandingHero = ({onGetStarted}) => {
       <button className='bg-blue-600 mt-10  text-white hover:bg-white hover:text-black border-2 border-black px-20 py-3 lg:py-5 text-lg lg:text-2xl font-semibold rounded-full' onClick={onGetStarted}>Start Creating</button>
     </div>
 
-    <div className='md:pt-20  relative'>
-      <div className='relative'>
+    
+      <div className='md:pt-20 relative'>
         <img src={heropic} alt='hero' className='rounded-lg md:max-w-6xl shadow-b-0 shadow-[rgba(0,0,15,0.5)_0px_-10px_20px_-15px] mx-auto md:h-auto w-auto h-auto '/>
         <div className='absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white dark:from-black to-transparent'></div>
       </div>
+ 
+    <div className='mt-40'>
+      <LandingPageSections onGetStarted={onGetStarted}/>
     </div>
+    
     </>
   );
 };
